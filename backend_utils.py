@@ -20,6 +20,7 @@ TF_MASK = 2 ** 16 - 1 # Masking the 16 low bits of an integer
 RE_WORD = re.compile(r"""[\#\@\w](['\-]?\w){2,24}""", re.UNICODE)
 
 BASE_PATH = '/content/Drive/Shareddrives/ir_proj_resources'
+BASE_PATH = '/home/friednet/ir_proj_resources'
 CORPUS_SIZE = 6348910
 
 english_stopwords = frozenset(stopwords.words('english'))
@@ -93,7 +94,6 @@ class QueriesCalc:
         self.doc_title_d = None  # contains a dictionary of (wiki_id: wiki title)
         self.page_rank_dataset = None  # data-frame of with two columns: doc_id, page_rank score. we use it to retrieve scores for a
         # list of wiki_ids fast
-        self.page_rank_d = None  # contains a dictionary of (wiki_id: p_rank score)
         self.page_views_d = None  # contains a dictionary of (wiki_id: number of page views). if the wiki_id do not appear in the DB then we return 0.
         self.load_indices()
         self.load_resource()
@@ -123,7 +123,6 @@ class QueriesCalc:
         """
         path = f'{self.base_path}/page_rank_data_set.csv.gz'
         self.page_rank_dataset = pd.read_csv(path, compression='gzip', header=None).rename({0: 'doc_id', 1: 'score'}, axis=1)
-        self.page_rank_d = dict(self.page_rank_dataset.itertuples(index=False, name=None))
         self.doc_len_d = pd.read_pickle(f'{self.base_path}/doc_len_f.pkl')
 
         self.doc_title_d = pd.read_pickle(f'{self.base_path}/id_title_dict.pkl')
@@ -167,7 +166,7 @@ class QueriesCalc:
         updated_sim_s_q = defaultdict(int)
         for doc_id, sim_score in sim_q_d.items():
             # updated_sim_s_q[doc_id] = sim_score * (1 / q_len) * np.sqrt(self.doc_nf_d[str(doc_id)])
-            updated_sim_s_q[doc_id] = sim_score * (1 / q_len) * self.doc_nf_d[str(doc_id)]
+            updated_sim_s_q[doc_id] = sim_score * (1 / q_len) * self.doc_nf_d[doc_id]
         res = sorted(updated_sim_s_q.items(), key=lambda item: item[1], reverse=True)[:k]
         wiki_ids = [tup[0] for tup in res]
         if get_scores:
