@@ -131,7 +131,6 @@ def search_anchor():
     if len(query) == 0:
         return jsonify(res)
     # BEGIN SOLUTION
-    print(f"query: {query}")
     _, q_unique_words = queries_calculator.get_token_per_query(query)
     wiki_id_list = queries_calculator.get_boolean_score_per_index(index_type='anchor', q_unique_words=q_unique_words)
     res = queries_calculator.get_wiki_titles(wiki_id_l=wiki_id_list)
